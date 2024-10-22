@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Canvas文字なぞり</title>
+    <style>
+        canvas {
+            border: 1px solid black;
+            display: block;
+            margin: 20px auto;
+        }
+        .text {
+            text-align: center;
+            font-size: 24px;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+
+<canvas id="canvas" width="600" height="200"></canvas>
+<div class="text">なぞる文字：</div>
+
+<script>
+    const canvas = document.getElementById('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // 文字リストを作成
+    const textList = ['Hello World', 'こんにちは', 'JavaScript', 'なぞってね', 'OpenAI', 'ランダム', 'キャンバス', 'プログラミング'];
+
+    // ランダムに文字を選択する関数
+    function getRandomText() {
+        const randomIndex = Math.floor(Math.random() * textList.length);
+        return textList[randomIndex];
+    }
+
+    // キャンバスの背景を設定
+    function clearCanvas() {
+        ctx.fillStyle = 'white';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+
+    // 文字を描画する関数
+    function drawText(text) {
+        ctx.font = '60px Arial';
+        ctx.fillStyle = 'gray';
+        ctx.fillText(text, 100, 100);
+    }
+
+    // 初期の文字をランダムに選択して描画
+    let randomText = getRandomText();
+    document.querySelector('.text').innerText = `なぞる文字：${randomText}`;
+    clearCanvas();
+    drawText(randomText);
+
+    let isDrawing = false;
+    let lastX = 0;
+    let lastY = 0;
+
+    // トレースする線の設定
+    function drawLine(x, y) {
+        ctx.strokeStyle = 'red';  // トレース線の色
+        ctx.lineWidth = 5;        // トレース線の太さ
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(lastX, lastY);
+        ctx.lineTo(x, y);
+        ctx.stroke();
+        [lastX, lastY] = [x, y];
+    }
+
+    // マウスが押されたとき
+    canvas.addEventListener('mousedown', (e) => {
+        isDrawing = true;
+        [lastX, lastY] = [e.offsetX, e.offsetY];
+    });
+
+    // マウスが動いたとき
+    canvas.addEventListener('mousemove', (e) => {
+        if (!isDrawing) return;
+        drawLine(e.offsetX, e.offsetY);
+    });
+
+    // マウスを離したとき
+    canvas.addEventListener('mouseup', () => {
+        isDrawing = false;
+    });
+
+    // キャンバスからマウスが離れたとき
+    canvas.addEventListener('mouseout', () => {
+        isDrawing = false;
+    });
+
+    // 新しい文字をランダムに選びたい場合
+    function changeText() {
+        randomText = getRandomText();
+        document.querySelector('.text').innerText = `なぞる文字：${randomText}`;
+        clearCanvas();
+        drawText(randomText);
+    }
+
+    // 任意のタイミングで文字を変更するためのボタン
+    const button = document.createElement('button');
+    button.innerText = '新しい文字を表示';
+    button.style.display = 'block';
+    button.style.margin = '20px auto';
+    button.addEventListener('click', changeText);
+    document.body.appendChild(button);
+
+</script>
+</body>
+</html>
